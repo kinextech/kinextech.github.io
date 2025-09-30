@@ -4,718 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free IT Security Assessment - Kinex Tech Solutions</title>
-    <meta name="description" content="Free IT health and security assessment for Michigan businesses. Get your risk score in 5 minutes.">
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body>
-    <div id="root"></div>
-    
-    <script type="text/babel">
-       import React, { useState } from 'react';
-import { Shield, Server, DollarSign, TrendingUp, AlertTriangle, CheckCircle, Users } from 'lucide-react';
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <div id="app" class="max-w-4xl mx-auto p-6"></div>
 
-const ITSecurityCalculator = () => {
-  const [step, setStep] = useState(1);
-  const [inputs, setInputs] = useState({
-    companyName: '',
-    industry: 'professional-services',
-    employees: '',
-    devices: '',
-    servers: 'none',
-    networkType: 'basic-wifi',
-    itSupport: 'none',
-    antivirus: 'none',
-    firewall: 'none',
-    backups: 'none',
-    passwordPolicy: 'none',
-    mfa: 'no',
-    lastSecurityAudit: 'never',
-    downtimeFrequency: 'rarely',
-    securityIncidents: 'none',
-    currentITBudget: ''
-  });
+    <script>
+      const app = document.getElementById('app');
+      let step = 1;
+      const data = {};
 
-  const [results, setResults] = useState(null);
+      const steps = {
+        1: { title: 'Company Information', fields: [
+          { id: 'companyName', label: 'Company Name (Optional)', type: 'text', placeholder: 'Your Company Name' },
+          { id: 'industry', label: 'Industry', type: 'select', options: ['Professional Services', 'Healthcare', 'Retail', 'Manufacturing', 'Hospitality', 'Education', 'Nonprofit', 'Other'] },
+          { id: 'employees', label: 'Number of Employees', type: 'number', placeholder: 'e.g., 15', required: true },
+          { id: 'devices', label: 'Number of Devices', type: 'number', placeholder: 'e.g., 20', required: true }
+        ]},
+        2: { title: 'IT Infrastructure', fields: [
+          { id: 'itSupport', label: 'Current IT Support', type: 'select', options: ['No IT support', 'Call someone when needed', 'Part-time IT person', 'Full-time IT staff', 'Managed Service Provider'] },
+          { id: 'servers', label: 'Server Infrastructure', type: 'select', options: ['No servers', 'Single server', 'Multiple servers', 'Cloud-only', 'Hybrid'] },
+          { id: 'networkType', label: 'Network Type', type: 'select', options: ['Basic WiFi', 'Business-grade WiFi', 'Wired network', 'Enterprise network'] },
+          { id: 'downtimeFrequency', label: 'IT Downtime Frequency', type: 'select', options: ['Rarely', 'Monthly', 'Weekly', 'Daily issues'] }
+        ]},
+        3: { title: 'Security Status', fields: [
+          { id: 'antivirus', label: 'Antivirus Protection', type: 'select', options: ['No antivirus', 'Free antivirus', 'Paid business antivirus', 'Enterprise endpoint protection'] },
+          { id: 'firewall', label: 'Firewall Protection', type: 'select', options: ['No firewall', 'Basic router firewall', 'Business firewall', 'Managed firewall'] },
+          { id: 'backups', label: 'Backup System', type: 'select', options: ['No backups', 'Occasional manual backups', 'Weekly automated backups', 'Daily automated backups', 'Real-time cloud backups'] },
+          { id: 'passwordPolicy', label: 'Password Policy', type: 'select', options: ['No password requirements', 'Basic requirements', 'Strong policy', 'Password manager enforced'] },
+          { id: 'mfa', label: 'Multi-Factor Authentication', type: 'select', options: ['Not using MFA', 'MFA on some accounts', 'MFA on all accounts'] },
+          { id: 'lastAudit', label: 'Last Security Audit', type: 'select', options: ['Never audited', 'Over 2 years ago', 'Within last year', 'Within last 6 months'] },
+          { id: 'incidents', label: 'Previous Security Incidents', type: 'select', options: ['No incidents', 'Minor issues', 'Moderate', 'Major breach'] }
+        ]}
+      };
 
-  const handleInputChange = (field, value) => {
-    setInputs(prev => ({ ...prev, [field]: value }));
-  };
-
-  const calculateResults = () => {
-    const employeeCount = parseInt(inputs.employees) || 0;
-    const deviceCount = parseInt(inputs.devices) || 0;
-    
-    let itScore = 100;
-    
-    if (inputs.itSupport === 'none') itScore -= 30;
-    else if (inputs.itSupport === 'occasional') itScore -= 15;
-    
-    if (inputs.servers === 'none' && employeeCount > 5) itScore -= 10;
-    if (inputs.networkType === 'basic-wifi' && employeeCount > 10) itScore -= 10;
-    if (inputs.downtimeFrequency === 'weekly') itScore -= 20;
-    else if (inputs.downtimeFrequency === 'monthly') itScore -= 10;
-    
-    let securityRisk = 0;
-    
-    if (inputs.antivirus === 'none') securityRisk += 20;
-    else if (inputs.antivirus === 'free') securityRisk += 10;
-    
-    if (inputs.firewall === 'none') securityRisk += 20;
-    else if (inputs.firewall === 'basic') securityRisk += 10;
-    
-    if (inputs.backups === 'none') securityRisk += 25;
-    else if (inputs.backups === 'occasional') securityRisk += 15;
-    else if (inputs.backups === 'weekly') securityRisk += 5;
-    
-    if (inputs.passwordPolicy === 'none') securityRisk += 15;
-    if (inputs.mfa === 'no') securityRisk += 10;
-    if (inputs.lastSecurityAudit === 'never') securityRisk += 10;
-    if (inputs.securityIncidents !== 'none') securityRisk += 15;
-    
-    const baseITCost = employeeCount * 75;
-    const deviceManagementCost = deviceCount * 25;
-    const securityCost = Math.max(150, employeeCount * 50);
-    const monitoringCost = Math.max(100, employeeCount * 30);
-    
-    const monthlyITCost = baseITCost + deviceManagementCost;
-    const monthlySecurityCost = securityCost;
-    const monthlyMonitoringCost = monitoringCost;
-    const totalMonthlyRecommended = monthlyITCost + monthlySecurityCost + monthlyMonitoringCost;
-    
-    const avgBreachCost = 50000;
-    const downtimeCostPerHour = employeeCount * 50;
-    const annualDowntimeHours = inputs.downtimeFrequency === 'weekly' ? 52 : inputs.downtimeFrequency === 'monthly' ? 12 : 2;
-    const annualDowntimeCost = downtimeCostPerHour * annualDowntimeHours;
-    
-    const annualInvestment = totalMonthlyRecommended * 12;
-    const annualRiskReduction = (securityRisk / 100) * avgBreachCost + annualDowntimeCost;
-    const netBenefit = annualRiskReduction - annualInvestment;
-    const roi = ((netBenefit / annualInvestment) * 100).toFixed(0);
-    
-    const recommendations = [];
-    
-    if (inputs.itSupport === 'none') {
-      recommendations.push({
-        priority: 'CRITICAL',
-        title: 'Establish IT Support',
-        description: 'No IT support detected. This leaves your business vulnerable to extended downtime.',
-        cost: '$500-1,500/month',
-        impact: 'Reduces downtime by 80%'
-      });
-    }
-    
-    if (inputs.antivirus === 'none' || inputs.firewall === 'none') {
-      recommendations.push({
-        priority: 'CRITICAL',
-        title: 'Implement Basic Security',
-        description: 'Missing essential security protection. Your business is at immediate risk.',
-        cost: '$200-500/month',
-        impact: 'Prevents 90% of common threats'
-      });
-    }
-    
-    if (inputs.backups === 'none') {
-      recommendations.push({
-        priority: 'CRITICAL',
-        title: 'Setup Automated Backups',
-        description: 'No backup system means data loss could destroy your business.',
-        cost: '$150-400/month',
-        impact: 'Protects against data loss'
-      });
-    }
-    
-    if (inputs.mfa === 'no') {
-      recommendations.push({
-        priority: 'HIGH',
-        title: 'Enable Multi-Factor Authentication',
-        description: 'Accounts are vulnerable to compromise without MFA.',
-        cost: '$50-150/month',
-        impact: 'Blocks 99.9% of account takeovers'
-      });
-    }
-    
-    if (inputs.lastSecurityAudit === 'never') {
-      recommendations.push({
-        priority: 'HIGH',
-        title: 'Conduct Security Audit',
-        description: 'Never been audited means unknown vulnerabilities exist.',
-        cost: '$500-1,500 one-time',
-        impact: 'Identifies all security gaps'
-      });
-    }
-    
-    if (inputs.passwordPolicy === 'none') {
-      recommendations.push({
-        priority: 'MEDIUM',
-        title: 'Implement Password Policy',
-        description: 'Weak passwords are the number one security vulnerability.',
-        cost: '$100-300 setup',
-        impact: 'Reduces breach risk by 60%'
-      });
-    }
-    
-    setResults({
-      itScore: Math.max(0, itScore),
-      securityRisk: Math.min(100, securityRisk),
-      securityGrade: securityRisk < 20 ? 'A' : securityRisk < 40 ? 'B' : securityRisk < 60 ? 'C' : securityRisk < 80 ? 'D' : 'F',
-      monthlyITCost,
-      monthlySecurityCost,
-      monthlyMonitoringCost,
-      totalMonthlyRecommended,
-      avgBreachCost,
-      annualDowntimeCost,
-      roi,
-      recommendations,
-      employeeCount,
-      deviceCount
-    });
-    
-    setStep(4);
-  };
-
-  const resetCalculator = () => {
-    setInputs({
-      companyName: '',
-      industry: 'professional-services',
-      employees: '',
-      devices: '',
-      servers: 'none',
-      networkType: 'basic-wifi',
-      itSupport: 'none',
-      antivirus: 'none',
-      firewall: 'none',
-      backups: 'none',
-      passwordPolicy: 'none',
-      mfa: 'no',
-      lastSecurityAudit: 'never',
-      downtimeFrequency: 'rarely',
-      securityIncidents: 'none',
-      currentITBudget: ''
-    });
-    setResults(null);
-    setStep(1);
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 bg-blue-600 rounded-full">
-              <Shield className="w-12 h-12 text-white" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Complete IT Health & Security Assessment
-          </h1>
-          <p className="text-gray-600">
-            Get your IT Efficiency Score + Security Risk Analysis in 5 minutes
-          </p>
-          <div className="mt-4 flex justify-center gap-2">
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-              Free Assessment
-            </span>
-            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-              Instant Results
-            </span>
-          </div>
-        </div>
-
-        {step < 4 && (
-          <div className="mb-8">
-            <div className="flex justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Step {step} of 3</span>
-              <span className="text-sm font-medium text-gray-700">{Math.round((step / 3) * 100)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(step / 3) * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {step === 1 && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Users className="w-6 h-6 text-blue-600" />
-              Company Information
-            </h2>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Company Name (Optional)
-              </label>
-              <input
-                type="text"
-                value={inputs.companyName}
-                onChange={(e) => handleInputChange('companyName', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Your Company Name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-              <select
-                value={inputs.industry}
-                onChange={(e) => handleInputChange('industry', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="professional-services">Professional Services</option>
-                <option value="healthcare">Healthcare</option>
-                <option value="retail">Retail</option>
-                <option value="manufacturing">Manufacturing</option>
-                <option value="hospitality">Hospitality</option>
-                <option value="education">Education</option>
-                <option value="nonprofit">Nonprofit</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Employees
-              </label>
-              <input
-                type="number"
-                value={inputs.employees}
-                onChange={(e) => handleInputChange('employees', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 15"
-                min="1"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Devices
-              </label>
-              <input
-                type="number"
-                value={inputs.devices}
-                onChange={(e) => handleInputChange('devices', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 20"
-                min="1"
-              />
-            </div>
-
-            <button
-              onClick={() => setStep(2)}
-              disabled={!inputs.employees || !inputs.devices}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            >
-              Continue to IT Infrastructure
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Server className="w-6 h-6 text-blue-600" />
-              IT Infrastructure
-            </h2>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Current IT Support</label>
-              <select
-                value={inputs.itSupport}
-                onChange={(e) => handleInputChange('itSupport', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No IT support</option>
-                <option value="occasional">Call someone when needed</option>
-                <option value="part-time">Part-time IT person</option>
-                <option value="full-time">Full-time IT staff</option>
-                <option value="managed">Managed Service Provider</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Server Infrastructure</label>
-              <select
-                value={inputs.servers}
-                onChange={(e) => handleInputChange('servers', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No servers</option>
-                <option value="single">Single server</option>
-                <option value="multiple">Multiple servers</option>
-                <option value="cloud-only">Cloud-only</option>
-                <option value="hybrid">Hybrid</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Network Type</label>
-              <select
-                value={inputs.networkType}
-                onChange={(e) => handleInputChange('networkType', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="basic-wifi">Basic WiFi</option>
-                <option value="business-wifi">Business-grade WiFi</option>
-                <option value="wired-network">Wired network</option>
-                <option value="enterprise">Enterprise network</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                How often do you experience IT downtime?
-              </label>
-              <select
-                value={inputs.downtimeFrequency}
-                onChange={(e) => handleInputChange('downtimeFrequency', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="rarely">Rarely</option>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-                <option value="daily">Daily issues</option>
-              </select>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => setStep(1)}
-                className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Back
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-              >
-                Continue to Security
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-blue-600" />
-              Security Status
-            </h2>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Antivirus Protection</label>
-              <select
-                value={inputs.antivirus}
-                onChange={(e) => handleInputChange('antivirus', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No antivirus</option>
-                <option value="free">Free antivirus</option>
-                <option value="paid">Paid business antivirus</option>
-                <option value="enterprise">Enterprise endpoint protection</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Firewall Protection</label>
-              <select
-                value={inputs.firewall}
-                onChange={(e) => handleInputChange('firewall', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No firewall</option>
-                <option value="basic">Basic router firewall</option>
-                <option value="business">Business firewall</option>
-                <option value="managed">Managed firewall</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Backup System</label>
-              <select
-                value={inputs.backups}
-                onChange={(e) => handleInputChange('backups', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No backups</option>
-                <option value="occasional">Occasional manual backups</option>
-                <option value="weekly">Weekly automated backups</option>
-                <option value="daily">Daily automated backups</option>
-                <option value="realtime">Real-time cloud backups</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password Policy</label>
-              <select
-                value={inputs.passwordPolicy}
-                onChange={(e) => handleInputChange('passwordPolicy', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No password requirements</option>
-                <option value="basic">Basic requirements</option>
-                <option value="strong">Strong policy</option>
-                <option value="managed">Password manager enforced</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Multi-Factor Authentication</label>
-              <select
-                value={inputs.mfa}
-                onChange={(e) => handleInputChange('mfa', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="no">Not using MFA</option>
-                <option value="some">MFA on some accounts</option>
-                <option value="all">MFA on all accounts</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Last Security Audit</label>
-              <select
-                value={inputs.lastSecurityAudit}
-                onChange={(e) => handleInputChange('lastSecurityAudit', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="never">Never audited</option>
-                <option value="over-2-years">Over 2 years ago</option>
-                <option value="last-year">Within last year</option>
-                <option value="recent">Within last 6 months</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Previous Security Incidents</label>
-              <select
-                value={inputs.securityIncidents}
-                onChange={(e) => handleInputChange('securityIncidents', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="none">No incidents</option>
-                <option value="minor">Minor issues</option>
-                <option value="moderate">Moderate</option>
-                <option value="major">Major breach</option>
-              </select>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => setStep(2)}
-                className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Back
-              </button>
-              <button
-                onClick={calculateResults}
-                className="flex-1 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
-              >
-                Get My Assessment
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && results && (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Assessment Results</h2>
-              <p className="text-gray-600">
-                {inputs.companyName || 'Your business'} - {results.employeeCount} employees, {results.deviceCount} devices
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">IT Efficiency Score</h3>
-                  <Server className="w-8 h-8 text-blue-600" />
+      function render() {
+        if (step <= 3) {
+          const s = steps[step];
+          app.innerHTML = `
+            <div class="bg-white rounded-xl shadow-2xl p-8">
+              <div class="text-center mb-8">
+                <div class="p-3 bg-blue-600 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                  <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-blue-600 mb-2">{results.itScore}</div>
-                  <div className="text-sm text-gray-600 mb-4">out of 100</div>
-                  <div className="w-full bg-blue-200 rounded-full h-3">
-                    <div className="bg-blue-600 h-3 rounded-full" style={{ width: `${results.itScore}%` }} />
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Complete IT Health & Security Assessment</h1>
+                <p class="text-gray-600">Get your IT Efficiency Score + Security Risk Analysis in 5 minutes</p>
+              </div>
+              <div class="mb-8">
+                <div class="flex justify-between mb-2">
+                  <span class="text-sm font-medium text-gray-700">Step ${step} of 3</span>
+                  <span class="text-sm font-medium text-gray-700">${Math.round((step/3)*100)}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-blue-600 h-2 rounded-full transition-all" style="width:${(step/3)*100}%"></div>
+                </div>
+              </div>
+              <h2 class="text-2xl font-bold text-gray-900 mb-6">${s.title}</h2>
+              <div class="space-y-6">
+                ${s.fields.map(f => `
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">${f.label}</label>
+                    ${f.type === 'select' 
+                      ? `<select id="${f.id}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                          ${f.options.map((opt, i) => `<option value="${i}">${opt}</option>`).join('')}
+                        </select>`
+                      : `<input type="${f.type}" id="${f.id}" placeholder="${f.placeholder || ''}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" ${f.required ? 'required' : ''}>`
+                    }
                   </div>
-                  <p className="mt-4 text-sm text-gray-700">
-                    {results.itScore >= 80 ? 'Excellent IT infrastructure' :
-                     results.itScore >= 60 ? 'Good, room for improvement' :
-                     results.itScore >= 40 ? 'Needs attention' : 'Critical improvements needed'}
-                  </p>
-                </div>
+                `).join('')}
               </div>
-
-              <div className="bg-gradient-to-br from-red-50 to-orange-100 rounded-xl p-6 border-2 border-orange-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">Security Risk Level</h3>
-                  <AlertTriangle className="w-8 h-8 text-orange-600" />
-                </div>
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-orange-600 mb-2">{results.securityGrade}</div>
-                  <div className="text-sm text-gray-600 mb-4">Risk Score: {results.securityRisk}/100</div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className={`h-3 rounded-full ${results.securityRisk < 30 ? 'bg-green-500' : results.securityRisk < 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                      style={{ width: `${results.securityRisk}%` }}
-                    />
-                  </div>
-                  <p className="mt-4 text-sm text-gray-700">
-                    {results.securityRisk < 30 ? 'Low risk' :
-                     results.securityRisk < 60 ? 'Moderate risk' : 'High risk - immediate action required'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <DollarSign className="w-6 h-6 text-green-600" />
-                Recommended Monthly Investment
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">IT Support and Maintenance</span>
-                  <span className="font-semibold text-gray-900">${results.monthlyITCost.toFixed(0)}/month</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Security Services</span>
-                  <span className="font-semibold text-gray-900">${results.monthlySecurityCost.toFixed(0)}/month</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Monitoring and Management</span>
-                  <span className="font-semibold text-gray-900">${results.monthlyMonitoringCost.toFixed(0)}/month</span>
-                </div>
-                <div className="border-t-2 border-gray-300 pt-3 flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-900">Total Monthly Investment</span>
-                  <span className="text-2xl font-bold text-green-600">${results.totalMonthlyRecommended.toFixed(0)}/month</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border-2 border-green-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-green-600" />
-                Return on Investment
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Potential Annual Risk Cost</div>
-                  <div className="text-2xl font-bold text-red-600">
-                    ${(results.avgBreachCost * (results.securityRisk / 100) + results.annualDowntimeCost).toFixed(0)}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">Data breach risk plus downtime costs</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">Projected ROI</div>
-                  <div className="text-2xl font-bold text-green-600">{results.roi}%</div>
-                  <div className="text-xs text-gray-500 mt-1">Annual return on IT investment</div>
-                </div>
-              </div>
-              <div className="mt-4 p-4 bg-white rounded-lg">
-                <p className="text-sm text-gray-700">
-                  For every dollar you invest in proper IT and security, 
-                  you save ${(Math.abs(parseInt(results.roi)) / 100 + 1).toFixed(2)} in prevented losses, 
-                  improved productivity, and avoided downtime.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border-2 border-gray-200">
-              <div className="bg-gray-100 px-6 py-4 rounded-t-xl">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <CheckCircle className="w-6 h-6 text-blue-600" />
-                  Priority Recommendations
-                </h3>
-              </div>
-              <div className="p-6 space-y-4">
-                {results.recommendations.map((rec, index) => (
-                  <div 
-                    key={index}
-                    className={`p-4 rounded-lg border-l-4 ${
-                      rec.priority === 'CRITICAL' ? 'bg-red-50 border-red-500' :
-                      rec.priority === 'HIGH' ? 'bg-orange-50 border-orange-500' :
-                      'bg-yellow-50 border-yellow-500'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <span className={`text-xs font-bold px-2 py-1 rounded ${
-                          rec.priority === 'CRITICAL' ? 'bg-red-200 text-red-800' :
-                          rec.priority === 'HIGH' ? 'bg-orange-200 text-orange-800' :
-                          'bg-yellow-200 text-yellow-800'
-                        }`}>
-                          {rec.priority}
-                        </span>
-                        <h4 className="font-bold text-gray-900 mt-2">{rec.title}</h4>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-semibold text-gray-900">{rec.cost}</div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700 mb-2">{rec.description}</p>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <TrendingUp className="w-4 h-4" />
-                      <span>{rec.impact}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-white text-center">
-              <h3 className="text-2xl font-bold mb-3">Ready to Fix These Issues?</h3>
-              <p className="text-blue-100 mb-6">
-                Schedule a free 30-minute consultation with Kinex Tech Solutions. 
-                We will create a custom action plan for your business.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a 
-                  href="tel:+1234567890"
-                  className="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
-                >
-                  Book Free Consultation
-                </a>
-                <button 
-                  onClick={() => window.print()}
-                  className="px-8 py-4 bg-blue-700 text-white rounded-lg font-bold text-lg hover:bg-blue-800 transition-colors border-2 border-white"
-                >
-                  Download Report
+              <div class="flex gap-4 mt-8">
+                ${step > 1 ? '<button onclick="navigate(-1)" class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">Back</button>' : ''}
+                <button onclick="navigate(1)" class="flex-1 py-3 ${step === 3 ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-lg font-semibold">
+                  ${step === 3 ? 'Get My Assessment' : 'Continue'}
                 </button>
               </div>
-              <p className="mt-4 text-sm text-blue-200">
-                No obligation • Free assessment • Local Michigan business
-              </p>
+              <div class="text-center mt-8 text-gray-600 text-sm">
+                <p>&copy; 2025 Kinex Tech Solutions | Serving Michigan Businesses</p>
+              </div>
             </div>
+          `;
+        } else {
+          showResults();
+        }
+      }
 
-            <div className="text-center">
-              <button
-                onClick={resetCalculator}
-                className="text-blue-600 hover:text-blue-700 font-semibold underline"
-              >
-                Run Another Assessment
-              </button>
+      function navigate(dir) {
+        steps[step].fields.forEach(f => {
+          const el = document.getElementById(f.id);
+          data[f.id] = el.value;
+        });
+        
+        if (dir > 0 && step === 1) {
+          if (!data.employees || !data.devices) {
+            alert('Please enter number of employees and devices');
+            return;
+          }
+        }
+        
+        step += dir;
+        render();
+      }
+
+      function showResults() {
+        const emp = parseInt(data.employees) || 0;
+        const dev = parseInt(data.devices) || 0;
+        
+        let itScore = 100;
+        if (data.itSupport === '0') itScore -= 30;
+        else if (data.itSupport === '1') itScore -= 15;
+        if (data.servers === '0' && emp > 5) itScore -= 10;
+        if (data.networkType === '0' && emp > 10) itScore -= 10;
+        if (data.downtimeFrequency === '2') itScore -= 20;
+        else if (data.downtimeFrequency === '1') itScore -= 10;
+        
+        let risk = 0;
+        if (data.antivirus === '0') risk += 20;
+        else if (data.antivirus === '1') risk += 10;
+        if (data.firewall === '0') risk += 20;
+        else if (data.firewall === '1') risk += 10;
+        if (data.backups === '0') risk += 25;
+        else if (data.backups === '1') risk += 15;
+        else if (data.backups === '2') risk += 5;
+        if (data.passwordPolicy === '0') risk += 15;
+        if (data.mfa === '0') risk += 10;
+        if (data.lastAudit === '0') risk += 10;
+        if (data.incidents !== '0') risk += 15;
+        
+        const grade = risk < 20 ? 'A' : risk < 40 ? 'B' : risk < 60 ? 'C' : risk < 80 ? 'D' : 'F';
+        const monthlyIT = emp * 75 + dev * 25;
+        const monthlySec = Math.max(150, emp * 50);
+        const monthlyMon = Math.max(100, emp * 30);
+        const total = monthlyIT + monthlySec + monthlyMon;
+        const downHrs = data.downtimeFrequency === '2' ? 52 : data.downtimeFrequency === '1' ? 12 : 2;
+        const annualDown = emp * 50 * downHrs;
+        const roi = Math.round((((risk/100)*50000 + annualDown - total*12) / (total*12)) * 100);
+        
+        const recs = [];
+        if (data.itSupport === '0') recs.push({p:'CRITICAL',t:'Establish IT Support',d:'No IT support detected.',c:'$500-1,500/mo'});
+        if (data.antivirus === '0' || data.firewall === '0') recs.push({p:'CRITICAL',t:'Implement Basic Security',d:'Missing essential protection.',c:'$200-500/mo'});
+        if (data.backups === '0') recs.push({p:'CRITICAL',t:'Setup Automated Backups',d:'No backup system detected.',c:'$150-400/mo'});
+        if (data.mfa === '0') recs.push({p:'HIGH',t:'Enable MFA',d:'Accounts vulnerable to compromise.',c:'$50-150/mo'});
+        
+        app.innerHTML = `
+          <div class="bg-white rounded-xl shadow-2xl p-8 space-y-8">
+            <div class="text-center">
+              <h2 class="text-3xl font-bold text-gray-900 mb-2">Your Assessment Results</h2>
+              <p class="text-gray-600">${data.companyName || 'Your business'} - ${emp} employees, ${dev} devices</p>
             </div>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
+                <h3 class="text-xl font-bold mb-4">IT Efficiency Score</h3>
+                <div class="text-center">
+                  <div class="text-6xl font-bold text-blue-600 mb-2">${itScore}</div>
+                  <div class="text-sm text-gray-600 mb-4">out of 100</div>
+                  <div class="w-full bg-blue-200 rounded-full h-3">
+                    <div class="bg-blue-600 h-3 rounded-full" style="width:${itScore}%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gradient-to-br from-red-50 to-orange-100 rounded-xl p-6 border-2 border-orange-200">
+                <h3 class="text-xl font-bold mb-4">Security Risk Level</h3>
+                <div class="text-center">
+                  <div class="text-6xl font-bold text-orange-600 mb-2">${grade}</div>
+                  <div class="text-sm text-gray-600 mb-4">Risk Score: ${risk}/100</div>
+                  <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div class="${risk<30?'bg-green-500':risk<60?'bg-yellow-500':'bg-red-500'} h-3 rounded-full" style="width:${risk}%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h3 class="text-xl font-bold mb-4">Recommended Monthly Investment</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between"><span>IT Support & Maintenance</span><span class="font-semibold">$${monthlyIT}/mo</span></div>
+                <div class="flex justify-between"><span>Security Services</span><span class="font-semibold">$${monthlySec}/mo</span></div>
+                <div class="flex justify-between"><span>Monitoring</span><span class="font-semibold">$${monthlyMon}/mo</span></div>
+                <div class="border-t-2 pt-3 flex justify-between"><span class="text-lg font-bold">Total</span><span class="text-2xl font-bold text-green-600">$${total}/mo</span></div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border-2 border-green-200">
+              <h3 class="text-xl font-bold mb-4">Return on Investment</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div><div class="text-sm text-gray-600">Potential Annual Risk</div><div class="text-2xl font-bold text-red-600">$${Math.round((risk/100)*50000+annualDown).toLocaleString()}</div></div>
+                <div><div class="text-sm text-gray-600">Projected ROI</div><div class="text-2xl font-bold text-green-600">${roi}%</div></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border-2 border-gray-200">
+              <div class="bg-gray-100 px-6 py-4 rounded-t-xl"><h3 class="text-xl font-bold">Priority Recommendations</h3></div>
+              <div class="p-6 space-y-4">
+                ${recs.map(r => `
+                  <div class="p-4 rounded-lg border-l-4 ${r.p==='CRITICAL'?'bg-red-50 border-red-500':'bg-orange-50 border-orange-500'}">
+                    <div class="flex justify-between mb-2">
+                      <div><span class="text-xs font-bold px-2 py-1 rounded ${r.p==='CRITICAL'?'bg-red-200 text-red-800':'bg-orange-200 text-orange-800'}">${r.p}</span><h4 class="font-bold mt-2">${r.t}</h4></div>
+                      <div class="text-sm font-semibold">${r.c}</div>
+                    </div>
+                    <p class="text-sm text-gray-700">${r.d}</p>
+                  </div>
+                `).join('') || '<p class="text-gray-600">Great job! Your setup is solid.</p>'}
+              </div>
+            </div>
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-white text-center">
+              <h3 class="text-2xl font-bold mb-3">Ready to Fix These Issues?</h3>
+              <p class="text-blue-100 mb-6">Schedule a free 30-minute consultation with Kinex Tech Solutions.</p>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="tel:+1234567890" class="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50">Book Free Consultation</a>
+                <button onclick="window.print()" class="px-8 py-4 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-800 border-2 border-white">Download Report</button>
+              </div>
+            </div>
+            <div class="text-center"><button onclick="location.reload()" class="text-blue-600 hover:text-blue-700 font-semibold underline">Run Another Assessment</button></div>
+            <div class="text-center text-gray-600 text-sm"><p>&copy; 2025 Kinex Tech Solutions | Serving Michigan Businesses</p></div>
           </div>
-        )}
-      </div>
+        `;
+      }
 
-      <div className="text-center mt-8 text-gray-600 text-sm">
-        <p>© 2025 Kinex Tech Solutions | Serving Michigan Businesses</p>
-        <p className="mt-2">Professional IT Support • Cybersecurity • Managed Services</p>
-      </div>
-    </div>
-  );
-};
-
-export default ITSecurityCalculator;
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<ITSecurityCalculator />);
+      render();
     </script>
 </body>
 </html>
