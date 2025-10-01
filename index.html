@@ -1,308 +1,194 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Small Business Security Risk Calculator</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50">
+  <div id="root"></div>
 
-const SecurityCalculator = () => {
-  const [formData, setFormData] = useState({
-    employees: "",
-    devices: "",
-    remote: "no",
-    backups: "none",
-    compliance: "none",
-    incidents: "0",
-  });
-  const [results, setResults] = useState(null);
+  <script type="text/babel">
+    const { useState } = React;
 
-  const calculateRisk = () => {
-    let score = 0;
-    const recs = [];
+    const Users = () => <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>;
+    const ShieldCheck = () => <svg className="w-8 h-8 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5-3V5a2 2 0 00-2-2H5a2 2 0 00-2 2v6a9 9 0 0018 0z"></path></svg>;
 
-    // Employee size
-    if (formData.employees <= 5) score += 5;
-    else if (formData.employees <= 20) score += 15;
-    else score += 25;
-
-    // Devices
-    if (formData.devices <= 10) score += 10;
-    else if (formData.devices <= 50) score += 20;
-    else score += 30;
-
-    // Remote work
-    if (formData.remote === "yes") {
-      score += 20;
-      recs.push({
-        t: "Secure Remote Access",
-        d: "You have remote workers. Enforce VPN, endpoint protection, and MFA.",
-        p: "CRITICAL",
-        c: "$150–$500/mo",
-        i: "High – prevents unauthorized access.",
+    const SecurityCalculator = () => {
+      const [formData, setFormData] = useState({
+        employees: "", devices: "", remote: "no", backups: "none",
+        compliance: "none", incidents: "0"
       });
-    }
+      const [results, setResults] = useState(null);
 
-    // Backups
-    if (formData.backups === "none") {
-      score += 30;
-      recs.push({
-        t: "Implement Backups",
-        d: "No backups detected. Set up daily encrypted cloud backups.",
-        p: "CRITICAL",
-        c: "$100–$300/mo",
-        i: "High – prevents catastrophic data loss.",
-      });
-    } else if (formData.backups === "weekly") {
-      score += 15;
-      recs.push({
-        t: "Upgrade Backup Frequency",
-        d: "Weekly backups may leave data gaps. Switch to daily backups.",
-        p: "HIGH",
-        c: "$50–$150/mo",
-        i: "Medium – reduces downtime impact.",
-      });
-    }
+      const calculateRisk = () => {
+        let score = 0;
+        const recs = [];
 
-    // Compliance
-    if (formData.compliance === "none") {
-      score += 15;
-      recs.push({
-        t: "Compliance Readiness",
-        d: "No compliance in place. If you handle sensitive data, this is critical.",
-        p: "HIGH",
-        c: "$500–$2000 project",
-        i: "High – avoids fines and legal risk.",
-      });
-    }
+        // Employee size
+        if (formData.employees <= 5) score += 5;
+        else if (formData.employees <= 20) score += 15;
+        else score += 25;
 
-    // Incidents
-    if (parseInt(formData.incidents) > 0) {
-      score += 10;
-      recs.push({
-        t: "Incident Response Plan",
-        d: "Past breaches detected. Create or update your incident response plan.",
-        p: "HIGH",
-        c: "$200–$800 project",
-        i: "High – reduces future breach impact.",
-      });
-    }
+        // Devices
+        if (formData.devices <= 10) score += 10;
+        else if (formData.devices <= 50) score += 20;
+        else score += 30;
 
-    // Risk tier
-    let riskLevel = "Low Risk";
-    if (score >= 90) riskLevel = "Critical Risk";
-    else if (score >= 60) riskLevel = "High Risk";
-    else if (score >= 30) riskLevel = "Medium Risk";
+        // Remote work
+        if (formData.remote === "yes") {
+          score += 20;
+          recs.push({ t: "Secure Remote Access", d: "Enforce VPN, endpoint protection, and MFA for remote workers.", p: "CRITICAL", c: "$150–$500/mo", i: "High – prevents unauthorized access." });
+        }
 
-    setResults({ score, riskLevel, recommendations: recs });
-  };
+        // Backups
+        if (formData.backups === "none") {
+          score += 30;
+          recs.push({ t: "Implement Backups", d: "No backups detected. Set up daily encrypted cloud backups.", p: "CRITICAL", c: "$100–$300/mo", i: "High – prevents catastrophic data loss." });
+        } else if (formData.backups === "weekly") {
+          score += 15;
+          recs.push({ t: "Upgrade Backup Frequency", d: "Weekly backups may leave gaps. Switch to daily backups.", p: "HIGH", c: "$50–$150/mo", i: "Medium – reduces downtime impact." });
+        }
 
-  const resetCalculator = () => {
-    setFormData({
-      employees: "",
-      devices: "",
-      remote: "no",
-      backups: "none",
-      compliance: "none",
-      incidents: "0",
-    });
-    setResults(null);
-  };
+        // Compliance
+        if (formData.compliance === "none") {
+          score += 15;
+          recs.push({ t: "Compliance Readiness", d: "No compliance in place. Critical for sensitive data.", p: "HIGH", c: "$500–$2000 project", i: "High – avoids fines and legal risk." });
+        }
 
-  return (
-    <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-8">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900">
-        🛡️ Small Business Security Risk Calculator
-      </h2>
-      <p className="text-gray-600 mb-6">
-        Answer a few quick questions to get a personalized security risk score and
-        recommended next steps.
-      </p>
+        // Incidents
+        if (parseInt(formData.incidents) > 0) {
+          score += 10;
+          recs.push({ t: "Incident Response Plan", d: "Past breaches detected. Create or update your plan.", p: "HIGH", c: "$200–$800 project", i: "High – reduces future breach impact." });
+        }
 
-      <AnimatePresence mode="wait">
-        {!results ? (
-          <motion.div
-            key="form"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Form */}
-            <div className="space-y-4">
-              <div>
-                <label className="block font-medium text-gray-800 mb-1">
-                  Number of Employees
-                </label>
-                <input
-                  type="number"
-                  value={formData.employees}
-                  onChange={(e) =>
-                    setFormData({ ...formData, employees: e.target.value })
-                  }
-                  className="w-full border rounded-lg p-2"
-                  placeholder="e.g. 10"
-                />
-              </div>
+        let riskLevel = "Low Risk";
+        if (score >= 90) riskLevel = "Critical Risk";
+        else if (score >= 60) riskLevel = "High Risk";
+        else if (score >= 30) riskLevel = "Medium Risk";
 
-              <div>
-                <label className="block font-medium text-gray-800 mb-1">
-                  Number of Devices
-                </label>
-                <input
-                  type="number"
-                  value={formData.devices}
-                  onChange={(e) =>
-                    setFormData({ ...formData, devices: e.target.value })
-                  }
-                  className="w-full border rounded-lg p-2"
-                  placeholder="e.g. 25"
-                />
-              </div>
+        setResults({ score, riskLevel, recommendations: recs });
+      };
 
-              <div>
-                <label className="block font-medium text-gray-800 mb-1">
-                  Do employees work remotely?
-                </label>
-                <select
-                  value={formData.remote}
-                  onChange={(e) =>
-                    setFormData({ ...formData, remote: e.target.value })
-                  }
-                  className="w-full border rounded-lg p-2"
-                >
-                  <option value="no">No</option>
-                  <option value="yes">Yes</option>
-                </select>
-              </div>
+      const resetCalculator = () => {
+        setFormData({ employees: "", devices: "", remote: "no", backups: "none", compliance: "none", incidents: "0" });
+        setResults(null);
+      };
 
-              <div>
-                <label className="block font-medium text-gray-800 mb-1">
-                  Backup Frequency
-                </label>
-                <select
-                  value={formData.backups}
-                  onChange={(e) =>
-                    setFormData({ ...formData, backups: e.target.value })
-                  }
-                  className="w-full border rounded-lg p-2"
-                >
-                  <option value="none">None</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="daily">Daily</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-medium text-gray-800 mb-1">
-                  Compliance Requirements
-                </label>
-                <select
-                  value={formData.compliance}
-                  onChange={(e) =>
-                    setFormData({ ...formData, compliance: e.target.value })
-                  }
-                  className="w-full border rounded-lg p-2"
-                >
-                  <option value="none">None</option>
-                  <option value="basic">Basic (HIPAA, PCI, etc.)</option>
-                  <option value="strict">Strict (Financial, Govt, etc.)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-medium text-gray-800 mb-1">
-                  Any past security incidents?
-                </label>
-                <input
-                  type="number"
-                  value={formData.incidents}
-                  onChange={(e) =>
-                    setFormData({ ...formData, incidents: e.target.value })
-                  }
-                  className="w-full border rounded-lg p-2"
-                  placeholder="e.g. 0"
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={calculateRisk}
-              className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Calculate My Risk
-            </button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="results"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Results */}
-            <h3 className="text-xl font-bold mb-2">Your Security Score</h3>
-            <div
-              className={`p-4 rounded-lg mb-4 text-center font-bold text-lg ${
-                results.riskLevel === "Critical Risk"
-                  ? "bg-red-600 text-white"
-                  : results.riskLevel === "High Risk"
-                  ? "bg-yellow-500 text-black"
-                  : results.riskLevel === "Medium Risk"
-                  ? "bg-orange-500 text-white"
-                  : "bg-green-600 text-white"
-              }`}
-            >
-              {results.riskLevel} – Score: {results.score}
-            </div>
-
-            <h4 className="font-semibold mb-2">Recommendations:</h4>
-            <div className="space-y-4">
-              {results.recommendations.map((rec, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg border-l-4 ${
-                    rec.p === "CRITICAL"
-                      ? "border-red-600 bg-red-50"
-                      : rec.p === "HIGH"
-                      ? "border-yellow-500 bg-yellow-50"
-                      : "border-green-500 bg-green-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-bold text-gray-900">{rec.t}</h4>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        rec.p === "CRITICAL"
-                          ? "bg-red-600 text-white"
-                          : rec.p === "HIGH"
-                          ? "bg-yellow-500 text-black"
-                          : "bg-green-600 text-white"
-                      }`}
-                    >
-                      {rec.p}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-700 mb-2">{rec.d}</p>
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium text-gray-900">Cost:</span>
-                    <span>{rec.c}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium text-gray-900">Impact:</span>
-                    <span>{rec.i}</span>
-                  </div>
+      return (
+        <div className="max-w-3xl mx-auto p-6 min-h-screen">
+          <div className="bg-white rounded-xl shadow-2xl p-8">
+            <div className="text-center mb-8">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-blue-600 rounded-full">
+                  <ShieldCheck className="text-white"/>
                 </div>
-              ))}
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Small Business Security Risk Calculator</h1>
+              <p className="text-gray-600">Quickly assess your company's IT and security risks and get actionable recommendations.</p>
             </div>
 
-            <button
-              onClick={resetCalculator}
-              className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Start New Assessment
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
+            {!results ? (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <Users /> Business Info
+                </h2>
 
-export default SecurityCalculator;
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
+                  <input type="number" placeholder="e.g., 10" className="w-full p-2 border border-gray-300 rounded-lg" value={formData.employees} onChange={e => setFormData({...formData, employees: e.target.value})} />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Number of Devices</label>
+                  <input type="number" placeholder="e.g., 25" className="w-full p-2 border border-gray-300 rounded-lg" value={formData.devices} onChange={e => setFormData({...formData, devices: e.target.value})} />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Remote Work?</label>
+                  <select className="w-full p-2 border border-gray-300 rounded-lg" value={formData.remote} onChange={e => setFormData({...formData, remote: e.target.value})}>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Backup Frequency</label>
+                  <select className="w-full p-2 border border-gray-300 rounded-lg" value={formData.backups} onChange={e => setFormData({...formData, backups: e.target.value})}>
+                    <option value="none">None</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="daily">Daily</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Compliance Level</label>
+                  <select className="w-full p-2 border border-gray-300 rounded-lg" value={formData.compliance} onChange={e => setFormData({...formData, compliance: e.target.value})}>
+                    <option value="none">None</option>
+                    <option value="basic">Basic</option>
+                    <option value="strict">Strict</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Past Security Incidents</label>
+                  <input type="number" placeholder="e.g., 0" className="w-full p-2 border border-gray-300 rounded-lg" value={formData.incidents} onChange={e => setFormData({...formData, incidents: e.target.value})} />
+                </div>
+
+                <button onClick={calculateRisk} className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">Calculate Risk</button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Security Score</h2>
+                <div className={`p-4 rounded-lg text-center font-bold text-lg ${
+                  results.riskLevel === "Critical Risk" ? "bg-red-600 text-white" :
+                  results.riskLevel === "High Risk" ? "bg-yellow-500 text-black" :
+                  results.riskLevel === "Medium Risk" ? "bg-orange-500 text-white" : "bg-green-600 text-white"
+                }`}>
+                  {results.riskLevel} – Score: {results.score}
+                </div>
+
+                <h3 className="font-semibold mb-2">Recommendations:</h3>
+                <div className="space-y-4">
+                  {results.recommendations.map((rec, idx) => (
+                    <div key={idx} className={`p-4 rounded-lg border-l-4 ${
+                      rec.p === "CRITICAL" ? "border-red-600 bg-red-50" :
+                      rec.p === "HIGH" ? "border-yellow-500 bg-yellow-50" :
+                      "border-green-500 bg-green-50"
+                    }`}>
+                      <div className="flex justify-between mb-2">
+                        <h4 className="font-bold text-gray-900">{rec.t}</h4>
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          rec.p === "CRITICAL" ? "bg-red-600 text-white" :
+                          rec.p === "HIGH" ? "bg-yellow-500 text-black" :
+                          "bg-green-600 text-white"
+                        }`}>{rec.p}</span>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-2">{rec.d}</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="font-medium text-gray-900">Cost:</span> <span>{rec.c}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="font-medium text-gray-900">Impact:</span> <span>{rec.i}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={resetCalculator} className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">Start New Assessment</button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<SecurityCalculator />);
+  </script>
+</body>
+</html>
